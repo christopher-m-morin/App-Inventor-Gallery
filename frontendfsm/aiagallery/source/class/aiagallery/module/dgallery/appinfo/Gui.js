@@ -198,6 +198,8 @@ qx.Class.define("aiagallery.module.dgallery.appinfo.Gui",
         // Create a button to allow users to "like" things.
         // FIXME: Implement this
         likeItButton = new qx.ui.form.Button("Like it!");
+	fsm.addObject("likeItButton", likeItButton);
+	likeItButton.addListener("execute", fsm.eventListener, fsm);
 
         // Add it to the left vbox.
         vboxLeft.add(likeItButton);
@@ -375,10 +377,11 @@ qx.Class.define("aiagallery.module.dgallery.appinfo.Gui",
         guiWrapper.setUserData("commentBox", commentBox);
         guiWrapper.setUserData("allCommentsBox", allCommentsBox);
         guiWrapper.setUserData("commentInput", commentInput);
+	guiWrapper.setUserData("likesLabel", viewsLikes);
+	guiWrapper.setUserData("numViewed", result.numViewed);
         fsm.addObject("guiWrapper", guiWrapper);
 
         canvas.setLayout(new qx.ui.layout.HBox());
-        
         canvas.add(new qx.ui.core.Widget(), { flex : 1 });
         canvas.add(hbox);
         canvas.add(new qx.ui.core.Widget(), { flex : 1 });
@@ -448,6 +451,22 @@ qx.Class.define("aiagallery.module.dgallery.appinfo.Gui",
           }
         }   
         break;
+      
+      case "likesPlusOne":
+        // Get the result data. It's an object with all of the application info.
+	result = response.data.result;
+
+	// Update the GUI
+	guiInfo = rpcRequest.getUserData("guiInfo");
+	var likesLabel = guiInfo.getUserData("likesLabel");
+	var numViewed = guiInfo.getUserData("numViewed");
+
+	likesLabel.setValue('<b>' +
+				  numViewed +
+				  ' views, ' +
+				  result +
+				  ' likes</b>');
+	break;
 
       default:
         throw new Error("Unexpected request type: " + requestType);
